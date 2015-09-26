@@ -1,3 +1,5 @@
+# INITIALISATION
+#################################################################################
 #
 #                        __ ____    _____        _    __ _ _
 #                       /_ |___ \  |  __ \      | |  / _(_) |
@@ -6,11 +8,6 @@
 #              | (_| (_| | |___) | | |__| | (_) | |_| | | | |  __/\__ \
 #               \___\__,_|_|____/  |_____/ \___/ \__|_| |_|_|\___||___/
 
-
-
-##################################################################################
-# INITIALISATION
-#################################################################################
 
 # Files will be created with these permissions:
 # files 644 -rw-r--r-- (666 minus 022)
@@ -24,7 +21,6 @@ umask 022
 [ -z "$PS1" ] && return
 
 
-#################################################################################
 # OS DETECTION
 #################################################################################
 
@@ -43,7 +39,7 @@ function get_os() {
   done
 }
 
-#################################################################################
+
 # HELPERS
 #################################################################################
 
@@ -53,6 +49,7 @@ function e_header()   { echo -e "\n\033[1m$@\033[0m"; }
 function e_success()  { echo -e " \033[1;32m✔\033[0m  $@"; }
 function e_error()    { echo -e " \033[1;31m✖\033[0m  $@"; }
 function e_arrow()    { echo -e " \033[1;34m➜\033[0m  $@"; }
+
 
 # Setup paths
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -84,7 +81,7 @@ function quiet_which() {
 }
 
 
-#################################################################################
+
 # EXPORT
 #################################################################################
 
@@ -109,6 +106,7 @@ fi
 
 export PATH
 
+
 # History and Shopt options
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 # Enable some Bash 4 features when possible
@@ -129,6 +127,7 @@ export HISTIGNORE='cd:ls:l:ll:la:lk:lh:lsd:lo:q:s:c:fs:history:h:hgrep:alg:v:o:s
 # Easily re-execute the last history command.
 alias r="fc -s"
 
+
 # Editors, Lang, Grep options, Github Api
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 [ -z "$TMPDIR" ] && export TMPDIR=/tmp
@@ -146,7 +145,7 @@ is_osx || export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:.:/usr/local/lib
 [ -s ~/.brew_github_api ] && export HOMEBREW_GITHUB_API_TOKEN=$(cat ~/.brew_github_api)
 
 
-#################################################################################
+
 # CONFIGS
 #################################################################################
 
@@ -158,14 +157,17 @@ elif [ -f /etc/bash_completion ] && ! shopt -oq posix; then
   . /etc/bash_completion
 fi
 
+
 # Docker
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 command -v docker-machine > /dev/null 2>&1 && eval "$(docker-machine env default)"
+
 
 # Z
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 # Init z https://github.com/rupa/z
 [ -f ~/z/z.sh ] && . ~/z/z.sh
+
 
 # SSH completion based on entries in known_hosts.
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -173,7 +175,8 @@ if [[ -e ~/.ssh/known_hosts ]]; then
   complete -o default -W "$(cat ~/.ssh/known_hosts | sed 's/[, ].*//' | sort | uniq | grep -v '[0-9]')" ssh scp sftp
 fi
 
-#################################################################################
+
+
 # PROMPT
 #################################################################################
 
@@ -187,6 +190,7 @@ else
   PS1="$PS1\[\e[m\]\w\[\e[1;31m\]> \[\e[0m\]"
 fi
 
+
 # Mini prompt
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 function miniprompt() {
@@ -195,6 +199,7 @@ function miniprompt() {
   PS1="$PS1\[\e[0;38m\]\w\[\e[1;35m\]> \[\e[0m\]"
 }
 
+
 # Super Mini prompt
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 function superminiprompt() {
@@ -202,7 +207,8 @@ function superminiprompt() {
   PS1="\[\e[38;5;168m\]> \[\e[0m\]"
 }
 
-#################################################################################
+
+
 # ALIASES
 #################################################################################
 
@@ -245,6 +251,7 @@ alias lo="ls -laF | awk '
   print
 }'"
 
+
 # Misc, Git, Bookmarks
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 # The space following sudo tells tells bash to check if the command that follow the space is also an alias
@@ -279,6 +286,7 @@ alias show='cat -n ~/.dirs | sed "s/^\([^.]*\)\=\(.*\)/-\1 --> \2/g"'
 save (){ command sed "/!$/d" ~/.dirs > ~/.dirs1; \mv ~/.dirs1 ~/.dirs; echo "$@"=\"`pwd`\" >> ~/.dirs; source ~/.dirs ;}
 source ~/.dirs  # initialisation de la fonction 'save': source le fichier .sdirs
 
+
 # Networking
 #=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 # View HTTP traffic
@@ -290,6 +298,7 @@ alias sniff="sudo ngrep -d 'en3' -t '^(GET|POST) ' 'tcp and port 80'"
 
 # Flush Directory Service cache
 alias flush="dscacheutil -flushcache"
+
 
 # Virtual machines
 #=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -305,6 +314,7 @@ command -v grunt > /dev/null 2>&1 && alias grunt="grunt --stack"
 # Use always htop if installed
 # sudo apt-get install htop
 command -v htop > /dev/null 2>&1 && alias top='htop'
+
 
 # OSX specific aliases
 #=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -337,6 +347,7 @@ if is_osx; then
 
 fi
 
+
 # Linux specific aliases
 #=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
@@ -358,7 +369,7 @@ if is_linux; then
 fi
 
 
-#################################################################################
+
 # FUNCTIONS
 #################################################################################
 
@@ -367,7 +378,8 @@ function md() {
   mkdir -p "$@" && cd "$_";
 }
 
-# change to parent directory matching partial string, eg:
+
+# Change to parent directory matching partial string, eg:
 # in directory /home/foo/bar/baz, 'bd f' changes to /home/foo
 function bd () {
   local old_dir=`pwd`
@@ -381,6 +393,7 @@ function bd () {
   fi
 }
 
+
 # `st` with no arguments opens the current directory in Sublime Text, otherwise
 # opens the given location
 function st() {
@@ -390,6 +403,7 @@ function st() {
     command -v subl > /dev/null 2>&1 || subl "$@";
   fi;
 }
+
 
 # `a` with no arguments opens the current directory in Atom Editor, otherwise
 # opens the given location
@@ -401,6 +415,7 @@ function a() {
   fi;
 }
 
+
 # `v` with no arguments opens the current directory in Vim, otherwise opens the
 # given location
 function v() {
@@ -410,6 +425,7 @@ function v() {
     command -v subl > /dev/null 2>&1 || vim "$@";
   fi;
 }
+
 
 # `o` with no arguments opens the current directory, otherwise opens the given
 # location
@@ -422,6 +438,7 @@ function o() {
 }
 
 
+# Rvm
 function rvm() {
   # Load RVM into a shell session *as a function*
   if [[ -s "$HOME/.rvm/scripts/rvm" ]]; then
@@ -436,6 +453,7 @@ function rvm() {
   fi
 }
 
+
 # Start an HTTP server from a directory, optionally specifying the port
 function server() {
   local port="${1:-8000}";
@@ -445,6 +463,7 @@ function server() {
   python -c $'import SimpleHTTPServer;\nmap = SimpleHTTPServer.SimpleHTTPRequestHandler.extensions_map;\nmap[""] = "text/plain";\nfor key, value in map.items():\n\tmap[key] = value + ";charset=UTF-8";\nSimpleHTTPServer.test();' "$port";
 }
 
+
 # Create a git.io short URL
 function gitio() {
   if [ -z "${1}" -o -z "${2}" ]; then
@@ -453,6 +472,7 @@ function gitio() {
   fi;
   curl -i http://git.io/ -F "url=${2}" -F "code=${1}";
 }
+
 
 # Determine size of a file or total size of a directory
 function fs() {
@@ -468,9 +488,11 @@ function fs() {
   fi;
 }
 
-#################################################################################
+
+
 # EXTRA
 #################################################################################
 
 LOCAL=$BASE/.bashrc.local
 [ -f "$LOCAL" ] && source "$LOCAL"
+

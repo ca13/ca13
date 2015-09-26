@@ -2,14 +2,18 @@
 	name = ca13
 	email = bloc.local@gmail.com
 
+
 [push]
   default = matching
+
 
 [merge]
   ff = only
 
+
 [fetch]
   prune = true
+
 
 [color]
   ui = auto
@@ -31,7 +35,7 @@
   new = green bold
   whitespace = red reverse
 
-# URL shorthands
+
 [url "git@github.com:"]
   insteadOf = "gh:"
   pushInsteadOf = "github:"
@@ -47,6 +51,7 @@
 
 [url "git://gist.github.com/"]
   insteadOf = "gist:"
+
 
 [alias]
   a = add --all
@@ -72,3 +77,4 @@
   st = stash
   t = tag
   alias = !git config --list | grep alias
+
