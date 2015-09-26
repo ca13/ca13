@@ -1,4 +1,3 @@
-
 " DESCRIPTION
 " =============================================================================
 
@@ -402,6 +401,7 @@ set mousehide
 set autoread " You can manually type :edit to reload open files
 set viewoptions=folds,options,cursor,unix,slash " Better Unix / Windows compatibility
 set history=10000 " Default is 20
+set gdefault
 
 
 " UI
@@ -467,7 +467,8 @@ set shiftwidth=2
 set expandtab smarttab " Use 'shiftwidth' when using <Tab>
 
 nmap <leader>fef :call Preserve("normal gg=G")<CR>
-
+" Strip trailing whitespace
+nnoremap <leader>W :%s/\s\+$//<cr>:let @/=''<CR>
 
 " Indent
 " =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -491,6 +492,12 @@ set magic
 set showmatch
 set matchtime=2
 set matchpairs+=<:>
+
+
+" Use tab to move through matching brackets/braces
+" ------------------------------------------------
+nnoremap <tab> %
+vnoremap <tab> %
 
 
 " Regex and hlsearch mappings
@@ -608,6 +615,10 @@ noremap <leader>f9 :set foldlevel=9<CR>
 " PasteToggle
 " =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 map ,, :set invpaste<CR>:set paste?<CR>
+" Set paste, paste some text, set nopaste
+nnoremap <Leader>p :set paste<CR>o<esc>
+" Select just-pasted text
+nnoremap gp `[v`]
 
 
 " Tab completion
@@ -620,7 +631,8 @@ set ofu=syntaxcomplete#Complete
 " List
 " =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 set list
-set listchars=tab:›\ ,trail:•,extends:›,precedes:‹,nbsp:+,eol:$
+"set listchars=tab:›\ ,trail:•,extends:›,precedes:‹,nbsp:+,eol:$
+set listchars=trail:•,nbsp:+,precedes:«,extends:»,eol:$,tab:▸\
 set fillchars=diff:-
 set showbreak=↪\
 nmap <leader>l :set list! list?<cr>
@@ -639,6 +651,8 @@ set t_vb=
 set splitbelow
 set splitright
 
+" Move around windows
+" -------------------
 nnoremap + <C-W>+
 nnoremap _ <C-W>-
 nnoremap = <C-W>>
@@ -653,6 +667,35 @@ inoremap <C-h> <C-o><C-w>h<C-w>_
 inoremap <C-j> <C-o><C-w>j<C-w>_
 inoremap <C-k> <C-o><C-w>k<C-w>_
 inoremap <C-l> <C-o><C-w>l<C-w>_
+
+
+" Some mappings for tabs: Cmd + number selects a particular tab
+" -------------------------------------------------------------
+map <D-S-]> gt
+map <D-S-[> gT
+map <D-1> 1gt
+map <D-2> 2gt
+map <D-3> 3gt
+map <D-4> 4gt
+map <D-5> 5gt
+map <D-6> 6gt
+map <D-7> 7gt
+map <D-8> 8gt
+map <D-9> 9gt
+" ...and Cmd + 0 selects the final tab
+map <D-0> :tablast<CR>
+
+
+" The minimum width of the active window
+" --------------------------------------
+set winwidth=84
+" We have to have a winheight bigger than we want to set winminheight. But if
+" we set winheight to be huge before winminheight, the winminheight set will
+" fail.
+set winheight=5
+set winminheight=5
+set winheight=999
+
 
 
 " Buffer
@@ -681,6 +724,36 @@ map <leader>ba :1,1000 bd!<cr>
 " -----------------------------------------
 set viminfo^=%
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+" Filetype
+" =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+" Git
+" ---
+au BufNewFile,BufRead *gitconfig set filetype=gitconfig
+autocmd FileType gitcommit set colorcolumn=72 spell
+
+
+" Ruby
+" ----
+autocmd FileType ruby
+  \ setlocal shiftwidth=2 |
+  \ setlocal tabstop=2 |
+  \ setlocal expandtab |
+  \ setlocal smarttab
+let b:ruby_no_expensive = 1
 
 
 " GUI
@@ -722,6 +795,13 @@ inoremap kj <ESC>
 nnoremap H ^
 nnoremap L $
 vnoremap L g_
+
+
+" Unmap help
+" ----------
+inoremap <F1> <ESC>
+nnoremap <F1> <ESC>
+vnoremap <F1> <ESC>
 
 
 " Edit vimrc
@@ -917,10 +997,6 @@ nmap <silent> <leader>A ^vio<C-V>$A
 if isdirectory(expand(expand(s:bundle_dir, 1) . '/vim-airline/'))
   let g:airline_powerline_fonts = 1
 
-  if isdirectory(expand(expand(s:bundle_dir, 1) . '/vim-obsession/'))
-    let g:airline_section_z = airline#section#create(['%{ObsessionStatus(''$'', '''')}', 'windowswap', '%3p%% ', 'linenr', ':%3v '])
-  endif
-
   if !exists('g:airline_symbols')
       let g:airline_symbols = {}
   endif
@@ -1018,6 +1094,14 @@ if isdirectory(expand(expand(s:bundle_dir, 1) . 'indentLine'))
 endif
 
 
+" Matchit
+" =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+" Load matchit.vim
+if !exists('g:loaded_matchit') && findfile('plugin/matchit.vim', &rtp) ==# ''
+  runtime! macros/matchit.vim
+endif
+
+
 " NERDTree
 " =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 if isdirectory(expand(expand(s:bundle_dir, 1) . '/nerdtree/'))
@@ -1031,6 +1115,23 @@ if isdirectory(expand(expand(s:bundle_dir, 1) . '/nerdtree/'))
   let NERDTreeShowHidden=1
   let NERDTreeKeepTreeInNewTab=1
   let g:nerdtree_tabs_open_on_gui_startup=0
+endif
+
+
+" Obsession
+" =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+if isdirectory(expand(expand(s:bundle_dir, 1) . '/vim-obsession/'))
+  " Autoload sessions created by vim-obsession when starting Vim
+  " The auto-restoring of sessions works on a per-directory basis,
+  " so you just need to start vim from within the directory you're working on and it will restore that session.
+  augroup sourcesession
+    autocmd!
+    autocmd VimEnter * nested
+    \ if !argc() && empty(v:this_session) && filereadable('Session.vim') |
+    \   source Session.vim |
+    \ endif
+  augroup END
+  let g:airline_section_z = airline#section#create(['%{ObsessionStatus(''$'', '''')}', 'windowswap', '%3p%% ', 'linenr', ':%3v '])
 endif
 
 
