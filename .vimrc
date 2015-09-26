@@ -149,6 +149,8 @@ if empty(glob('~/.vim/autoload/plug.vim'))
 endif
 
 
+" Begin Plugins Install
+" =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 call plug#begin(expand(s:bundle_dir, 1))
 
 " Core
@@ -384,6 +386,7 @@ if !exists("g:override_ca13_bundles")
   endif
 
 endif
+
 
 call plug#end()
 
