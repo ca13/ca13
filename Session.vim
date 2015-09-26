@@ -150,11 +150,11 @@ silent! normal! zE
 1151,1438fold
 980,1438fold
 1440,1447fold
-let s:l = 648 - ((255 * winheight(0) + 9) / 18)
+let s:l = 1 - ((0 * winheight(0) + 8) / 17)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-648
+1
 normal! 0
 lcd ~/ca13
 tabnext 1
