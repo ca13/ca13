@@ -19,6 +19,18 @@ set encoding=utf-8
 set fileencoding=utf-8
 scriptencoding utf-8
 
+" Autoload sessions created by vim-obsession when starting Vim
+" The auto-restoring of sessions works on a per-directory basis,
+" so you just need to start vim from within the directory you're working on and it will restore that session.
+augroup sourcesession
+autocmd!
+autocmd VimEnter * nested
+  \ if !argc() && empty(v:this_session) && filereadable('Session.vim') |
+  \   source Session.vim |
+  \ endif
+augroup END
+
+
 
 " ENVIRONMENT
 " =============================================================================
@@ -1121,16 +1133,6 @@ endif
 " Obsession
 " =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 if isdirectory(expand(expand(s:bundle_dir, 1) . '/vim-obsession/'))
-  " Autoload sessions created by vim-obsession when starting Vim
-  " The auto-restoring of sessions works on a per-directory basis,
-  " so you just need to start vim from within the directory you're working on and it will restore that session.
-  augroup sourcesession
-    autocmd!
-    autocmd VimEnter * nested
-    \ if !argc() && empty(v:this_session) && filereadable('Session.vim') |
-    \   source Session.vim |
-    \ endif
-  augroup END
   let g:airline_section_z = airline#section#create(['%{ObsessionStatus(''$'', '''')}', 'windowswap', '%3p%% ', 'linenr', ':%3v '])
 endif
 
