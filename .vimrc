@@ -19,6 +19,12 @@ set encoding=utf-8
 set fileencoding=utf-8
 scriptencoding utf-8
 
+" Create vimrc autocmd group and remove any existing vimrc autocmds,
+" in case .vimrc is re-sourced.
+augroup vimrc
+  autocmd!
+augroup END
+
 
 " ENVIRONMENT
 " =============================================================================
@@ -66,6 +72,9 @@ endif
 " Variables
 " =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 let s:is_msys = ($MSYSTEM =~? 'MINGW\d\d')
+
+" Switch to Solarized colorscheme
+" let g:ca13_solarized=1
 
 
 
@@ -177,7 +186,7 @@ endif
 " g:ca13_bundle_groups
 " =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 if !exists('g:ca13_bundle_groups')
-    let g:ca13_bundle_groups=[ 'general', 'programming', 'neocomplete', 'blade', 'c', 'csv', 'docker', 'go', 'html', 'javascript', 'nginx', 'php', 'python', 'ruby', 'scala', 'sql', 'writting' ]
+  let g:ca13_bundle_groups=[ 'general', 'programming', 'neocomplete', 'blade', 'c', 'csv', 'docker', 'go', 'html', 'javascript', 'nginx', 'php', 'python', 'ruby', 'scala', 'sql', 'writting' ]
 endif
 
 
@@ -195,7 +204,8 @@ if !exists("g:override_ca13_bundles")
     Plug 'airblade/vim-gitgutter'
     Plug 'mhinz/vim-signify'
     Plug 'MattesGroeger/vim-bookmarks'
-    Plug 'tpope/vim-obsession'
+    Plug 'mhinz/vim-startify'
+    "Plug 'tpope/vim-obsession'
     "Plug 'xolox/vim-session' | Plug 'xolox/vim-misc'
     Plug 'kien/ctrlp.vim' | Plug 'tacahiroy/ctrlp-funky'
     Plug 'Shougo/vimshell.vim'
@@ -396,12 +406,14 @@ call plug#end()
 " =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 let mapleader = ','
 let g:mapleader = ','
-set mouse=a
+set hidden " When a buffer is brought to foreground, remember undo history and marks
+set report=0 " Show all changes.
+set mouse=a " Enable mouse in all modes
+"set shortmess+=I " Turn off vim-startify plugin and  Bram's Molinear message (to see the message, type :intro)
 set mousehide
 set autoread " You can manually type :edit to reload open files
 set viewoptions=folds,options,cursor,unix,slash " Better Unix / Windows compatibility
 set history=10000 " Default is 20
-set gdefault
 
 
 " UI
@@ -423,9 +435,21 @@ endfunction
 noremap <leader>bg :call ToggleBG()<CR>
 
 
-" Solarized
-" ---------
-if isdirectory(expand(expand(s:bundle_dir, 1) . '/vim-colors-solarized/'))
+" Colorscheme
+" -----------
+" Make invisible chars less visible in terminal.
+autocmd vimrc ColorScheme * :hi NonText ctermfg=236
+autocmd vimrc ColorScheme * :hi SpecialKey ctermfg=236
+" Make selection more visible.
+autocmd vimrc ColorScheme * :hi Visual guibg=#00588A
+autocmd vimrc ColorScheme * :hi link multiple_cursors_cursor Search
+autocmd vimrc ColorScheme * :hi link multiple_cursors_visual Visual
+
+
+if !exists('g:ca13_solarized') && isdirectory(expand(expand(s:bundle_dir, 1) . '/molokai/'))
+  let g:molokai_italic=0
+  colorscheme molokai
+elseif isdirectory(expand(expand(s:bundle_dir, 1) . '/vim-colors-solarized/'))
   let g:solarized_termcolors=256
   let g:solarized_termtrans=1
   let g:solarized_contrast="normal"
@@ -439,15 +463,29 @@ if isdirectory(expand(expand(s:bundle_dir, 1) . '/vim-colors-solarized/'))
 endif
 
 
+set colorcolumn=+1
+set showtabline=2   " Always show tab bar
+set textwidth=80
+set nowrap
+set title
+
 " Statusline
 " ----------
 set laststatus=2
+set noshowmode    " vi-airline takes care of us
 
+
+" Scrolling
+" =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+set scrolloff=3 " Start scrolling three lines before horizontal border of window.
+set sidescrolloff=3 " Start scrolling three columns before vertical border of window.
 
 
 " Number
 " =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-set number numberwidth=3
+autocmd vimrc InsertEnter * :set norelativenumber
+autocmd vimrc InsertLeave * :set relativenumber
+
 function! NumberToggle()
   if(&relativenumber == 1)
     set norelativenumber
@@ -478,13 +516,13 @@ vnoremap < <gv
 vnoremap > >gv
 
 
-" Search
+" Search / Replace
 " =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 " Search main settings
 " --------------------
+set gdefault
 set confirm
 set ignorecase
-set infercase
 set smartcase
 set hlsearch
 set incsearch
@@ -630,9 +668,13 @@ set ofu=syntaxcomplete#Complete
 
 " List
 " =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+if WINDOWS()
+  set listchars=trail:•,nbsp:_,precedes:«,extends:»,eol:$,tab:>\
+else
+  set listchars=trail:•,nbsp:_,precedes:«,extends:»,eol:$,tab:▸\
+endif
+
 set list
-"set listchars=tab:›\ ,trail:•,extends:›,precedes:‹,nbsp:+,eol:$
-set listchars=trail:•,nbsp:+,precedes:«,extends:»,eol:$,tab:▸\
 set fillchars=diff:-
 set showbreak=↪\
 nmap <leader>l :set list! list?<cr>
@@ -648,16 +690,20 @@ set t_vb=
 
 " Windows navigation
 " =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+" Split
+" -----
 set splitbelow
 set splitright
 
-" Move around windows
+" Sizing windows
 " -------------------
 nnoremap + <C-W>+
 nnoremap _ <C-W>-
 nnoremap = <C-W>>
 nnoremap - <C-W><_
 
+" Ctrl-H/J/K/L select split
+" -------------------------
 nnoremap <C-h> <C-w>h<C-w>_
 nnoremap <C-j> <C-w>j<C-w>_
 nnoremap <C-k> <C-w>k<C-w>_
@@ -697,6 +743,8 @@ nnoremap <right> :bp<CR>
 " Quick buffer open
 " -----------------
 nnoremap <leader>bl :ls<cr>:e #
+" List other buffers
+nnoremap <leader>b :CtrlPBuffer<CR>
 
 
 " Close current buffer
@@ -713,35 +761,29 @@ map <leader>ba :1,1000 bd!<cr>
 set viminfo^=%
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 " Filetype
 " =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 " Git
 " ---
-au BufNewFile,BufRead *gitconfig set filetype=gitconfig
-autocmd FileType gitcommit set colorcolumn=72 spell
+autocmd vimrc BufNewFile,BufRead *gitconfig set filetype=gitconfig
+autocmd vimrc FileType gitcommit set colorcolumn=72 spell
 
+" Markdown
+" --------
+autocmd vimrc BufRead,BufNewFile *.md set filetype=markdown
 
 " Ruby
 " ----
-autocmd FileType ruby
+autocmd vimrc FileType ruby
   \ setlocal shiftwidth=2 |
   \ setlocal tabstop=2 |
   \ setlocal expandtab |
   \ setlocal smarttab
 let b:ruby_no_expensive = 1
+
+" Vim
+" ---
+autocmd vimrc BufRead .vimrc,*.vim set keywordprg=:help
 
 
 " GUI
@@ -885,18 +927,14 @@ noremap <leader>mm mmHmt:%s/<C-V><cr>//ge<cr>'tzt'm
 " =============================================================================
 " Automatically reload the vimrc config
 " =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-augroup vimrc_myvimrc
-  autocmd!
-  autocmd BufWritePost .vimrc,_vimrc,vimrc,.gvimrc,_gvimrc,gvimrc so $MYVIMRC | if has('gui_running') | so $MYGVIMRC | endif
-augroup END
+autocmd vimrc BufWritePost .vimrc,_vimrc,vimrc,.gvimrc,_gvimrc,gvimrc  so $MYVIMRC |
+  \ if has('gui_running') | so $MYGVIMRC |
+  \ endif
 
 
 " Remember cursor position
 " =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-augroup vimrc_cursor
-  autocmd!
-  autocmd BufReadPost * call setpos(".", getpos("'\""))
-augroup END
+autocmd vimrc BufReadPost * call setpos(".", getpos("'\""))
 
 
 " Remove trailing spaces :Chomp
@@ -989,13 +1027,19 @@ if isdirectory(expand(expand(s:bundle_dir, 1) . '/vim-airline/'))
       let g:airline_symbols = {}
   endif
 
-  if !exists('g:airline_theme')
+  if !exists('g:ca13_solarized') && !exists('g:airline_theme') && isdirectory(expand(expand(s:bundle_dir, 1) . '/molokai/'))
+    let g:airline_theme = 'badwolf'
+  elseif isdirectory(expand(expand(s:bundle_dir, 1) . '/vim-colors-solarized/'))
     let g:airline_theme = 'solarized'
   endif
 
   let g:airline_symbols.paste = 'ρ'
   let g:airline_symbols.space = "\ua0"
   let g:airline#extensions#tabline#enabled = 1
+  let g:airline#extensions#tabline#buffer_nr_format = '%s '
+  let g:airline#extensions#tabline#buffer_nr_show = 1
+  "let g:airline#extensions#tabline#fnamecollapse = 0
+  "let g:airline#extensions#tabline#fnamemod = ':t'
   let g:airline#extensions#tagbar#enabled = 1
   let g:airline#extensions#whitespace#enabled = 1
 endif
@@ -1034,11 +1078,17 @@ if isdirectory(expand(expand(s:bundle_dir, 1) . '/ctrlp.vim/'))
   endif
 
   let g:ctrlp_working_path_mode = 'ra'
+  map <leader>p <C-P>
+  map <leader>r :CtrlPMRUFiles<CR>
 
   if OSX() || LINUX()
-    set wildignore+=*/tmp/*,*.so,*.swp,*.zip     " MacOSX/Linux
+    set wildignore+=*/tmp/*,*.so,*.swp,*.zip,*.jpg,*.jpeg,*.png,*.gif,*.psd,*.o     " MacOSX/Linux
+    set wildignore+=*/bower_components/*,*/node_modules/*
+    set wildignore+=*/vendor/*,*/.git/*,*/.hg/*,*/.svn/*,*/log/*
   elseif WINDOWS()
-    set wildignore+=*\\tmp\\*,*.swp,*.zip,*.exe  " Windows
+    set wildignore+=*\\tmp\\*,*.so,*.swp,*.zip,*.exe,*.jpg,*.jpeg,*.png,*.gif,*.psd,*.o   " Windows
+    set wildignore+=*\\bower_components\\*,*\\node_modules\\*
+    set wildignore+=*\\vendor\\*,*\\.git\\*,*\\.hg\\*,*\\.svn\\*,*\\log\\*
 endif
 
   let g:ctrlp_custom_ignore = {
@@ -1052,7 +1102,7 @@ endif
 if isdirectory(expand(expand(s:bundle_dir, 1) . '/emmet-vim/'))
   let g:user_emmet_leader_key='<c-e>'
   let g:user_emmet_install_global = 0
-  autocmd FileType html,css EmmetInstall
+  autocmd vimrc FileType html,css EmmetInstall
 endif
 
 
@@ -1103,6 +1153,18 @@ if isdirectory(expand(expand(s:bundle_dir, 1) . '/nerdtree/'))
   let NERDTreeShowHidden=1
   let NERDTreeKeepTreeInNewTab=1
   let g:nerdtree_tabs_open_on_gui_startup=0
+
+  " If no file or directory arguments are specified, open NERDtree.
+  " If a directory is specified as the only argument, open it in NERDTree.
+  autocmd vimrc VimEnter *
+    \ if argc() == 0 && !exists("s:std_in") |
+    \   NERDTree |
+    \ elseif argc() == 1 && isdirectory(argv(0)) |
+    \   bd |
+    \   exec 'cd' fnameescape(argv(0)) |
+    \   NERDTree |
+    \ end
+
 endif
 
 
@@ -1130,6 +1192,16 @@ if isdirectory(expand(expand(s:bundle_dir, 1) . '/vim-sauce'))
   if isdirectory(expand(s:cache_dir, 1))
     call CreateDir(s:cache_dir . '/vimsauce/')
     let g:sauce_path = expand(s:cache_dir, 1) . '/vimsauce/'
+  endif
+endif
+
+
+" Startify
+" =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+if isdirectory(expand(expand(s:bundle_dir, 1) . '/vim-startify'))
+  if isdirectory(expand(s:cache_dir, 1))
+    call CreateDir(s:cache_dir . '/sessions/')
+    let g:startify_session_dir = expand(s:cache_dir, 1) . '/sessions/'
   endif
 endif
 
