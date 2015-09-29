@@ -1,7 +1,13 @@
 # ca13-dotfiles
 
-##Installation sur Linux, OSX, Unix like
+##Pré-requis
 
-sh <(curl http://bit.ly/1O0idqr -L)
-ou
+- Installation [Curl]
+- Installation [Vim]
+- Installation [Git]
+
+##Installation on Linux, OSX, Unix like
+
+```bash
 sh <(curl https://j.mp/ca13-dotfiles -L)
+```
