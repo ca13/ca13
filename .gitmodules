@@ -1,0 +1,9 @@
+[submodule "dircolors/dircolors-solarized"]
+	path = dircolors/dircolors-solarized
+	url = https://github.com/seebi/dircolors-solarized.git
+[submodule "dircolors/trapd00r"]
+	path = dircolors/trapd00r
+	url = https://github.com/trapd00r/LS_COLORS.git
+[submodule "dircolors/jmcantrell"]
+	path = dircolors/jmcantrell
+	url = https://github.com/ca13/dircolors.git
