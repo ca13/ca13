@@ -1,6 +1,6 @@
 # ca13-dotfiles
 
-##Pré-requis
+##Pre-requisites
 
 - Installation [Curl]
 - Installation [Vim]

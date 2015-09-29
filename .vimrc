@@ -1154,16 +1154,18 @@ if isdirectory(expand(expand(s:bundle_dir, 1) . '/nerdtree/'))
   let NERDTreeKeepTreeInNewTab=1
   let g:nerdtree_tabs_open_on_gui_startup=0
 
-  " If no file or directory arguments are specified, open NERDtree.
-  " If a directory is specified as the only argument, open it in NERDTree.
-  autocmd vimrc VimEnter *
-    \ if argc() == 0 && !exists("s:std_in") |
-    \   NERDTree |
-    \ elseif argc() == 1 && isdirectory(argv(0)) |
-    \   bd |
-    \   exec 'cd' fnameescape(argv(0)) |
-    \   NERDTree |
-    \ end
+  if !isdirectory(expand(expand(s:bundle_dir, 1) . '/vim-startify/'))
+    " If no file or directory arguments are specified, open NERDtree.
+    " If a directory is specified as the only argument, open it in NERDTree.
+    autocmd vimrc VimEnter *
+      \ if argc() == 0 && !exists("s:std_in") |
+      \   NERDTree |
+      \ elseif argc() == 1 && isdirectory(argv(0)) |
+      \   bd |
+      \   exec 'cd' fnameescape(argv(0)) |
+      \   NERDTree |
+      \ end
+  endif
 
 endif
 
