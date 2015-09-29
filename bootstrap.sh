@@ -31,7 +31,7 @@ function logo() {
 
 # Init files
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-function init_files() { echo ""; }
+function init_files() { e_success "Tout est OK!!!"; }
 
 # Sync repo
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
